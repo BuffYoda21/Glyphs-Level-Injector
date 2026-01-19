@@ -1,12 +1,13 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace LevelInjector {
     public class RoomData {
-        [JsonProperty("roomName")]
-        public string RoomName;
+        [JsonProperty("localPosition")]
+        public Vec2 LocalPosition;
 
         [JsonProperty("tiles")]
-        public TileData[] Tiles;
+        public List<TileData> Tiles;
     }
 
     public class TileData {

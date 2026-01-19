@@ -1,60 +1,76 @@
 using System.IO;
-using MelonLoader;
+using HarmonyLib;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace LevelInjector {
+    [HarmonyPatch]
     public static class RoomLoader {
-        public static GameObject CreateRoom(string path, Transform parent, Vector2 offset) {
-            GameObject room = LoadRoomData(path);
-            if (room == null) return null;
-            room.transform.SetParent(parent);
-            room.transform.localPosition = offset;
-            return room;
+        [HarmonyPatch(typeof(SceneManager), "Internal_SceneLoaded")]
+        [HarmonyPostfix]
+        public static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+            if (scene.handle == lastSceneHandle) return;
+            lastSceneHandle = scene.handle;
+            LoadRooms(scene.name);
         }
 
-        public static GameObject LoadRoomData(string path) {
-            path = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", path);
+        public static void LoadRooms(string sceneName) {
+            string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", sceneName);
+            if (!Directory.Exists(rootPath)) return;
 
-            if (!File.Exists(path)) {
-                MelonLogger.Error($"[RoomLoader] File not found: {path}");
-                return null;
+            foreach (string jsonPath in Directory.GetFiles(rootPath, "*.json", SearchOption.AllDirectories)) {
+                LoadRoomFromFile(jsonPath, rootPath);
+            }
+        }
+
+        private static void LoadRoomFromFile(string jsonPath, string rootPath) {
+            string relativePath = Path.GetRelativePath(rootPath, jsonPath);
+            string[] pathParts = relativePath.Split(Path.DirectorySeparatorChar);
+
+            GameObject currentParent = null;
+            for (int i = 0; i < pathParts.Length - 1; i++) {
+                string folderName = pathParts[i];
+                GameObject existing = currentParent != null ? currentParent.transform.Find(folderName)?.gameObject : GameObject.Find(folderName);
+
+                if (existing == null) {
+                    existing = new GameObject(folderName);
+                    if (currentParent != null) existing.transform.SetParent(currentParent.transform);
+                }
+
+                currentParent = existing;
             }
 
-            string json = File.ReadAllText(path);
+            string fileName = Path.GetFileNameWithoutExtension(jsonPath);
+            GameObject roomObj = new GameObject(fileName);
+            roomObj.transform.SetParent(currentParent?.transform);
 
-            RoomData roomData;
-            try {
-                roomData = JsonConvert.DeserializeObject<RoomData>(json);
-            } catch (JsonException e) {
-                MelonLogger.Error($"[RoomLoader] JSON parse error:\n{e}");
-                return null;
+            string json = File.ReadAllText(jsonPath);
+            RoomData roomData = JsonConvert.DeserializeObject<RoomData>(json);
+
+            if (roomData != null) {
+                if (roomData.LocalPosition != null) {
+                    roomObj.transform.localPosition = new Vector3(
+                        roomData.LocalPosition.X,
+                        roomData.LocalPosition.Y,
+                        0f
+                    );
+                }
+
+                CreateSquareSprite();
+                if (roomData.Tiles != null) {
+                    foreach (TileData tile in roomData.Tiles) {
+                        SpawnTile(tile, roomObj.transform);
+                    }
+                }
             }
-
-            if (roomData == null) {
-                MelonLogger.Error("[RoomLoader] RoomData is null");
-                return null;
-            }
-
-            GameObject roomParent = new GameObject(
-                string.IsNullOrEmpty(roomData.RoomName)
-                    ? "Room"
-                    : roomData.RoomName
-            );
-
-            if (roomData.Tiles == null)
-                return roomParent;
-
-            foreach (TileData tile in roomData.Tiles) {
-                SpawnTile(tile, roomParent.transform);
-            }
-
-            return roomParent;
         }
 
         private static void SpawnTile(TileData data, Transform parent) {
-            GameObject tile = Object.Instantiate(new GameObject("Tile"), parent);
+            GameObject tile = new GameObject("Tile");
+            tile.transform.SetParent(parent);
+            tile.layer = 3; // tile layer
 
             BoxCollider2D col = tile.AddComponent<BoxCollider2D>();
             col.size = new Vector2(1f, 1f);
@@ -107,5 +123,6 @@ namespace LevelInjector {
         }
 
         private static Sprite squareSprite;
+        private static int lastSceneHandle = -1;
     }
 }
