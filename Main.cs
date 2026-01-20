@@ -9,13 +9,11 @@ namespace LevelInjector {
         [System.Obsolete]
         public override void OnApplicationStart() {
             if (isInitialized) return;
-            var harmony = new HarmonyLib.Harmony("LevelInjector.Patches");
-            harmony.PatchAll();
-
             // class injection here
 
             isInitialized = true;
         }
-        bool isInitialized = false;
+
+        private bool isInitialized = false;
     }
 }
