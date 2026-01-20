@@ -38,20 +38,44 @@ namespace LevelInjector {
             string json = File.ReadAllText(jsonPath);
             RoomData roomData = JsonConvert.DeserializeObject<RoomData>(json);
 
-            if (roomData != null) {
-                if (roomData.LocalPosition != null) {
-                    roomObj.transform.localPosition = new Vector3(
-                        roomData.LocalPosition.X,
-                        roomData.LocalPosition.Y,
-                        0f
-                    );
-                }
+            if (roomData == null) return;
 
-                CreateSquareSprite();
-                if (roomData.Tiles != null) {
-                    foreach (TileData tile in roomData.Tiles) {
-                        SpawnTile(tile, roomObj.transform);
-                    }
+            if (roomData.LocalPosition != null) {
+                roomObj.transform.localPosition = new Vector3(
+                    roomData.LocalPosition.X,
+                    roomData.LocalPosition.Y,
+                    0f
+                );
+            }
+
+            CreateSquareSprite();
+
+            if (roomData.Tiles != null) {
+                foreach (TileData tile in roomData.Tiles) {
+                    SpawnTile(tile, roomObj.transform);
+                }
+            }
+
+            if (roomData.Bg != null) {
+                GameObject bg = new GameObject("bg");
+                bg.transform.SetParent(roomObj.transform);
+
+                SpriteRenderer sr = bg.AddComponent<SpriteRenderer>();
+                sr.color = new Color32(
+                    roomData.Bg.Color.R,
+                    roomData.Bg.Color.G,
+                    roomData.Bg.Color.B,
+                    roomData.Bg.Color.A
+                );
+                sr.sortingOrder = -100;
+
+                if (roomData.Bg.Path == null) {
+                    sr.sprite = squareSprite;
+                    bg.transform.localScale = new Vector2(28.5f, 16f);
+                } else {
+                    string dataPath = Path.Combine(MelonEnvironment.ModsDirectory, "SpriteData");
+                    sr.sprite = SpriteLoader.LoadSpriteFromFile(Path.Combine(dataPath, roomData.Bg.Path), roomData.Bg.ImgSize.Width, roomData.Bg.ImgSize.Height);
+                    bg.transform.localScale = new Vector2(roomData.Bg.Scale.X, roomData.Bg.Scale.Y);
                 }
             }
         }

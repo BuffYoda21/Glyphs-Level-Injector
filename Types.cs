@@ -8,6 +8,9 @@ namespace LevelInjector {
 
         [JsonProperty("tiles")]
         public List<TileData> Tiles;
+
+        [JsonProperty("bg")]
+        public BgData Bg;
     }
 
     public class TileData {
@@ -27,6 +30,28 @@ namespace LevelInjector {
 
         [JsonProperty("y")]
         public float Y;
+    }
+
+    public class BgData {
+        [JsonProperty("color")]
+        public Color32Data Color;
+
+        [JsonProperty("path")]
+        public string Path;
+
+        [JsonProperty("imgSize")]
+        public Dimensions ImgSize;
+
+        [JsonProperty("scale")]
+        public Vec2 Scale;
+    }
+
+    public class Dimensions {
+        [JsonProperty("width")]
+        public int Width;
+
+        [JsonProperty("height")]
+        public int Height;
     }
 
     public class Color32Data {
