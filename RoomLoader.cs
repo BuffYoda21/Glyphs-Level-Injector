@@ -1,21 +1,10 @@
 using System.IO;
-using HarmonyLib;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace LevelInjector {
-    [HarmonyPatch]
     public static class RoomLoader {
-        [HarmonyPatch(typeof(SceneManager), "Internal_SceneLoaded")]
-        [HarmonyPostfix]
-        public static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-            if (scene.handle == lastSceneHandle) return;
-            lastSceneHandle = scene.handle;
-            LoadRooms(scene.name);
-        }
-
         public static void LoadRooms(string sceneName) {
             string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", sceneName);
             if (!Directory.Exists(rootPath)) return;

@@ -1,0 +1,109 @@
+using System.Collections;
+using HarmonyLib;
+using Il2Cpp;
+using MelonLoader;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace LevelInjector {
+    [HarmonyPatch]
+    public static class SceneLoader {
+        public static void LoadCustomScene(string scene) {
+            customSceneToLoad = scene;
+            CachePlayerAbilities();
+            SceneManager.LoadScene("Memory");
+        }
+
+        [HarmonyPatch(typeof(SceneManager), "Internal_SceneLoaded")]
+        [HarmonyPostfix]
+        public static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+            if (scene.handle == lastSceneHandle) return;
+            lastSceneHandle = scene.handle;
+            string sceneToLoad = scene.name;
+            if (sceneToLoad == "Memory" && !string.IsNullOrEmpty(customSceneToLoad)) {
+                sceneToLoad = customSceneToLoad;
+                customSceneToLoad = null;
+                MelonCoroutines.Start(FullClearScene());
+                RestorePlayerAbilities();
+            }
+            RoomLoader.LoadRooms(sceneToLoad);
+        }
+
+        private static IEnumerator FullClearScene() {
+            ClearMemoryScene();
+            yield return null;
+            ClearMemoryScene();
+        }
+
+        private static void ClearMemoryScene() {
+            Object.Destroy(GameObject.Find("World"));
+            Object.Destroy(GameObject.Find("Square (19)"));
+            Object.Destroy(GameObject.Find("Square (20)"));
+            Object.Destroy(GameObject.Find("Square (21)"));
+            Object.Destroy(GameObject.Find("Square (22)"));
+            Object.Destroy(GameObject.Find("BackGround"));
+            Object.Destroy(GameObject.Find("BackGround (1)"));
+            Object.Destroy(GameObject.Find("MapManager"));
+        }
+
+        private static void RestorePlayerAbilities() {
+            PlayerController player = GameObject.Find("Player")?.GetComponent<PlayerController>();
+            if (!player) return;
+            player.midairJumpsMax = playerState.jumps;
+            player.saveCrystals = playerState.saveCrystals;
+            player.fragments = playerState.fragments;
+            player.hp = playerState.hp;
+            player.maxHp = playerState.maxHp;
+            player.attackBonus = playerState.attackBonus;
+            player.goldfragments = playerState.goldFragments;
+            player.parryCD = playerState.parryCD;
+            player.dashAttackChargeMax = playerState.dashAttackCD;
+            player.hasGrapple = playerState.grapple;
+            player.hasParry = playerState.parry;
+            player.dashAttack = playerState.dashAttack;
+            player.hasWeapon = playerState.hasWeapon;
+            player.hasShroud = playerState.shroud;
+        }
+
+        private static void CachePlayerAbilities() {
+            PlayerController player = GameObject.Find("Player")?.GetComponent<PlayerController>();
+            if (!player) return;
+            MelonLogger.Msg("Caching player abilities");
+            playerState.jumps = player.midairJumpsMax;
+            playerState.saveCrystals = player.saveCrystals;
+            playerState.fragments = player.fragments;
+            playerState.hp = player.hp;
+            playerState.maxHp = player.maxHp;
+            playerState.attackBonus = player.attackBonus;
+            playerState.goldFragments = player.goldfragments;
+            playerState.parryCD = player.parryCD;
+            playerState.dashAttackCD = player.dashAttackChargeMax;
+            playerState.grapple = player.hasGrapple;
+            playerState.parry = player.hasParry;
+            playerState.dashAttack = player.dashAttack;
+            playerState.hasWeapon = player.hasWeapon;
+            playerState.shroud = player.hasShroud;
+        }
+
+        private class PlayerState {
+            public int jumps = 0;
+            public int saveCrystals = 0;
+            public int fragments = 0;
+            public int goldFragments = 0;
+            public float hp = 100;
+            public float maxHp = 100;
+            public float attackBonus = 0;
+            public float parryCD = 2f;
+            public float dashAttackCD = 1f;
+            public bool grapple = false;
+            public bool parry = false;
+            public bool dashAttack = false;
+            public bool hasWeapon = false;
+            public bool shroud = false;
+        }
+
+        private static int lastSceneHandle = -1;
+        private static string customSceneToLoad = null;
+        private static PlayerState playerState = new PlayerState();
+    }
+}
