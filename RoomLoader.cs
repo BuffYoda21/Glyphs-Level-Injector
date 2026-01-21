@@ -1,4 +1,5 @@
 using System.IO;
+using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -78,6 +79,12 @@ namespace LevelInjector {
                     bg.transform.localScale = new Vector2(roomData.Bg.Scale.X, roomData.Bg.Scale.Y);
                 }
             }
+
+            if (roomData.Elements != null) {
+                foreach (PrefabData prefab in roomData.Elements) {
+                    SpawnPrefab(prefab, roomObj.transform);
+                }
+            }
         }
 
         private static void SpawnTile(TileData data, Transform parent) {
@@ -95,17 +102,8 @@ namespace LevelInjector {
             else
                 sr.sprite = squareSprite;
 
-            tile.transform.localPosition = new Vector3(
-                data.Position.X,
-                data.Position.Y,
-                0f
-            );
-
-            tile.transform.localScale = new Vector3(
-                data.Scale.X,
-                data.Scale.Y,
-                1f
-            );
+            tile.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
+            tile.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
 
             if (data.Color != null) {
                 sr.color = new Color32(
@@ -115,6 +113,20 @@ namespace LevelInjector {
                     data.Color.A
                 );
             }
+        }
+
+        private static void SpawnPrefab(PrefabData data, Transform parent) {
+            GameObject prefab = Object.Instantiate(Resources.Load<GameObject>(data.PrefabPath));
+            if (prefab == null) {
+                MelonLogger.Error($"Prefab {data.PrefabPath} not found!");
+                return;
+            }
+
+            prefab.name = data.Name;
+            prefab.transform.SetParent(parent);
+            prefab.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
+            prefab.transform.localRotation = Quaternion.Euler(0f, 0f, data.Rotation);
+            prefab.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
         }
 
         private static Sprite CreateSquareSprite() {

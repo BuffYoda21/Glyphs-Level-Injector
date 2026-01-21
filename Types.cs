@@ -11,6 +11,9 @@ namespace LevelInjector {
 
         [JsonProperty("bg")]
         public BgData Bg;
+
+        [JsonProperty("elements")]
+        public List<PrefabData> Elements;
     }
 
     public class TileData {
@@ -52,6 +55,23 @@ namespace LevelInjector {
 
         [JsonProperty("height")]
         public int Height;
+    }
+
+    public class PrefabData {
+        [JsonProperty("prefab")]
+        public string PrefabPath;
+
+        [JsonProperty("name")]
+        public string Name;
+
+        [JsonProperty("position")]
+        public Vec2 Position;
+
+        [JsonProperty("rotation")]
+        public float Rotation;
+
+        [JsonProperty("scale")]
+        public Vec2 Scale;
     }
 
     public class Color32Data {
