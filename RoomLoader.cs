@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using System.IO;
+using HarmonyLib;
+using Il2Cpp;
 using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace LevelInjector {
+    [HarmonyPatch]
     public static class RoomLoader {
         public static void LoadRooms(string sceneName) {
             string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", sceneName);
@@ -15,7 +19,67 @@ namespace LevelInjector {
             }
         }
 
-        private static void LoadRoomFromFile(string jsonPath, string rootPath) {
+        [HarmonyPatch(typeof(BetweenManager), "LoadRoomsFromResources")]
+        [HarmonyPrefix]
+        public static void OnBetweenLoad(BetweenManager __instance) {
+            string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "BetweenRooms");
+            if (!Directory.Exists(rootPath)) return;
+
+            foreach (string jsonPath in Directory.GetFiles(rootPath, "*.json", SearchOption.AllDirectories)) {
+                GameObject room = LoadRoomFromFile(jsonPath, rootPath);
+                if (!room || room.name.Length < 2) continue;
+                char[] prefix = room.name.ToCharArray();
+                if (
+                    (prefix[0] != '_' && prefix[0] != '-' && prefix[0] != '^') ||
+                    (prefix[1] != '_' && prefix[1] != '-' && prefix[1] != '^')
+                ) continue;
+
+                BetweenManager.EntranceType roomEntrance = BetweenManager.EntranceType.Top;
+                BetweenManager.ExitType roomExit = BetweenManager.ExitType.Top;
+                switch (prefix[0]) {
+                    case '_': roomEntrance = BetweenManager.EntranceType.Bottom; break;
+                    case '-': roomEntrance = BetweenManager.EntranceType.Middle; break;
+                    case '^': roomEntrance = BetweenManager.EntranceType.Top; break;
+                }
+                switch (prefix[1]) {
+                    case '_': roomExit = BetweenManager.ExitType.Bottom; break;
+                    case '-': roomExit = BetweenManager.ExitType.Middle; break;
+                    case '^': roomExit = BetweenManager.ExitType.Top; break;
+                }
+                BetweenManager.Room betweenRoom = new BetweenManager.Room() {
+                    roomObject = room,
+                    entrance = roomEntrance,
+                    exit = roomExit,
+                };
+                __instance.rooms.Add(betweenRoom);
+                injectedRooms.Add(room);
+            }
+
+            GameObject roomParent = new GameObject("CustomBetweenRooms");
+            foreach (GameObject room in injectedRooms) {
+                room.SetActive(false);
+                room.transform.SetParent(roomParent.transform);
+                room.transform.position = new Vector3(-200f, 0f, 0f);
+            }
+        }
+
+        [HarmonyPatch(typeof(BetweenManager), "InstantiateRoom")]
+        [HarmonyPrefix]
+        public static void OnInstantiateRoom(BetweenManager.Room room, Vector3 position) {
+            bool isCustom = false;
+            foreach (GameObject obj in injectedRooms) {
+                if (obj.name == room.roomObject.name)
+                    isCustom = true;
+            }
+            if (isCustom) {
+                foreach (GameObject obj in injectedRooms) {
+                    obj.SetActive(false);
+                }
+                room.roomObject.SetActive(true);
+            }
+        }
+
+        private static GameObject LoadRoomFromFile(string jsonPath, string rootPath) {
             string relativePath = Path.GetRelativePath(rootPath, jsonPath);
             string[] pathParts = relativePath.Split(Path.DirectorySeparatorChar);
 
@@ -39,7 +103,7 @@ namespace LevelInjector {
             string json = File.ReadAllText(jsonPath);
             RoomData roomData = JsonConvert.DeserializeObject<RoomData>(json);
 
-            if (roomData == null) return;
+            if (roomData == null) return null;
 
             if (roomData.LocalPosition != null) {
                 roomObj.transform.localPosition = new Vector3(
@@ -85,6 +149,8 @@ namespace LevelInjector {
                     SpawnPrefab(prefab, roomObj.transform);
                 }
             }
+
+            return roomObj;
         }
 
         private static void SpawnTile(TileData data, Transform parent) {
@@ -147,6 +213,7 @@ namespace LevelInjector {
             return squareSprite;
         }
 
+        private static List<GameObject> injectedRooms = new List<GameObject>();
         private static Sprite squareSprite;
         private static int lastSceneHandle = -1;
     }
