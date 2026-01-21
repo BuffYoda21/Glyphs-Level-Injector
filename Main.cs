@@ -1,7 +1,7 @@
 using MelonLoader;
 using Il2CppInterop.Runtime.Injection;
 
-[assembly: MelonInfo(typeof(LevelInjector.Main), "LevelInjector", "0.0.1", "BuffYoda21")]
+[assembly: MelonInfo(typeof(LevelInjector.Main), "LevelInjector", "0.0.2", "BuffYoda21")]
 [assembly: MelonGame("Vortex Bros.", "GLYPHS")]
 
 namespace LevelInjector {
