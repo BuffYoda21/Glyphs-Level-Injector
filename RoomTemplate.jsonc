@@ -1,0 +1,57 @@
+{
+  "localPosition": { "x": 0, "y": 0 },  // position of the room relative to its parent (or the world origin)
+  "bg": {
+    "color": { "r": 0, "g": 0, "b": 0, "a": 255 },  // background color
+    "path": null, // path to image data (needs to be converted to raw rgba format), path starts from /Mods/CustomRooms/SpriteData/, null to just use solid color
+    "imgSize": { "width": 0, "height": 0 }, // size of the image used (ex: 1280x720), if incorrect the image will appear distorted, only matters if path is set
+    "scale": { "x": 12.5, "y": 12.5 } // how much to scale the image up or down (since imgSize only matters for reading image data), only matters if path is set
+  },
+  "tiles": [
+    {
+      "position": { "x": 0, "y": -7.5 },  // position of the tile relative to the room
+      "scale": { "x": 28.5, "y": 1.5 }, // size of the tile
+      "color": { "r": 31, "g": 31, "b": 31, "a": 255 }  // color of the tile
+    },
+    {
+      "position": { "x": -12.4, "y": -6 },
+      "scale": { "x": 3.75, "y": 2 },
+      "color": { "r": 31, "g": 31, "b": 31, "a": 255 }
+    },
+    {
+      "position": { "x": 0, "y": 6.5 },
+      "scale": { "x": 28.5, "y": 3 },
+      "color": { "r": 31, "g": 31, "b": 31, "a": 255 }
+    },
+    {
+      "position": { "x": -12.4, "y": 2 },
+      "scale": { "x": 3.75, "y": 6 },
+      "color": { "r": 31, "g": 31, "b": 31, "a": 255 }
+    },
+    {
+      "position": { "x": 12.4, "y": -2.5 },
+      "scale": { "x": 3.75, "y": 8.5 },
+      "color": { "r": 31, "g": 31, "b": 31, "a": 255 }
+    },
+    {
+      "position": { "x": 12.4, "y": 4.5 },
+      "scale": { "x": 3.75, "y": 1 },
+      "color": { "r": 31, "g": 31, "b": 31, "a": 255 }
+    }
+  ],
+  "elements": [ // advanced: loading game prefabs
+    {
+      "prefab": "prefabs/platforming/SwapB", // path to prefab, can be found by dumping game assets with AssetRipper
+      "name": "SwapBlock",  // name of object, for organization purposes, only really matters when using UnityExplorer
+      "position": { "x": 0, "y": 0 },
+      "rotation": 90,
+      "scale": { "x": 1, "y": 1 } // Usually keep this 1x1 for most prefabs
+    },
+    {
+      "prefab": "prefabs/platforming/SwapA",
+      "name": "SwapBlock",
+      "position": { "x": 0, "y": -2 },
+      "rotation": 90,
+      "scale": { "x": 1, "y": 1 }
+    }
+  ]
+}
