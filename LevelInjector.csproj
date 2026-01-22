@@ -36,8 +36,8 @@
     <Reference Include="UnityEngine.Il2CppAssetBundleManager">
       <HintPath>UnityEngine.Il2CppAssetBundleManager.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>UnityEngine.ImageConversionModule.dll</HintPath>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule">
       <HintPath>UnityEngine.Physics2DModule.dll</HintPath>
