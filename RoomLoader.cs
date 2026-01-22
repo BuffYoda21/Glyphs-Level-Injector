@@ -141,7 +141,7 @@ namespace LevelInjector {
                     sr.sprite = squareSprite;
                     bg.transform.localScale = new Vector2(28.5f, 16f);
                 } else {
-                    string dataPath = Path.Combine(MelonEnvironment.ModsDirectory, "SpriteData");
+                    string dataPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "SpriteData");
                     sr.sprite = SpriteLoader.LoadSpriteFromFile(Path.Combine(dataPath, roomData.Bg.Path), roomData.Bg.ImgSize.Width, roomData.Bg.ImgSize.Height);
                     bg.transform.localScale = new Vector2(roomData.Bg.Scale.X, roomData.Bg.Scale.Y);
                 }
