@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
@@ -14,7 +15,8 @@ namespace LevelInjector {
             string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", sceneName);
             if (!Directory.Exists(rootPath)) return;
 
-            foreach (string jsonPath in Directory.GetFiles(rootPath, "*.json", SearchOption.AllDirectories)) {
+            foreach (string jsonPath in Directory.GetFiles(rootPath, "*.json", SearchOption.AllDirectories)
+                        .Concat(Directory.GetFiles(rootPath, "*.jsonc", SearchOption.AllDirectories))) {
                 LoadRoomFromFile(jsonPath, rootPath);
             }
         }
@@ -25,7 +27,8 @@ namespace LevelInjector {
             string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "BetweenRooms");
             if (!Directory.Exists(rootPath)) return;
 
-            foreach (string jsonPath in Directory.GetFiles(rootPath, "*.json", SearchOption.AllDirectories)) {
+            foreach (string jsonPath in Directory.GetFiles(rootPath, "*.json", SearchOption.AllDirectories)
+                        .Concat(Directory.GetFiles(rootPath, "*.jsonc", SearchOption.AllDirectories))) {
                 GameObject room = LoadRoomFromFile(jsonPath, rootPath);
                 if (!room || room.name.Length < 2) continue;
                 char[] prefix = room.name.ToCharArray();
