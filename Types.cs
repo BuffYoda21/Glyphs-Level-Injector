@@ -72,6 +72,15 @@ namespace LevelInjector {
 
         [JsonProperty("scale")]
         public Vec2 Scale;
+
+        [JsonProperty("color")]
+        public Color32Data Color;
+
+        [JsonProperty("SlidingPlatform")]
+        public SlidingPlatformData SlidingPlatform;
+
+        [JsonProperty("BouncePlatform")]
+        public BouncePlatformData BouncePlatform;
     }
 
     public class Color32Data {
@@ -86,5 +95,24 @@ namespace LevelInjector {
 
         [JsonProperty("a")]
         public byte A;
+    }
+
+    public class SlidingPlatformData {
+        [JsonProperty("xv")]
+        public float Xvelocity;
+
+        [JsonProperty("yv")]
+        public float Yvelocity;
+
+        [JsonProperty("isIce")]
+        public bool IsIce;
+    }
+
+    public class BouncePlatformData {
+        [JsonProperty("xstrength")]
+        public float Xstrength;
+
+        [JsonProperty("ystrength")]
+        public float Ystrength;
     }
 }

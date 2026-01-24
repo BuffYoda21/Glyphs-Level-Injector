@@ -24,6 +24,8 @@ namespace LevelInjector {
         [HarmonyPatch(typeof(BetweenManager), "LoadRoomsFromResources")]
         [HarmonyPrefix]
         public static void OnBetweenLoad(BetweenManager __instance) {
+            injectedRooms.Clear();
+
             string rootPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "BetweenRooms");
             if (!Directory.Exists(rootPath)) return;
 
@@ -185,17 +187,46 @@ namespace LevelInjector {
         }
 
         private static void SpawnPrefab(PrefabData data, Transform parent) {
-            GameObject prefab = Object.Instantiate(Resources.Load<GameObject>(data.PrefabPath));
-            if (prefab == null) {
-                MelonLogger.Error($"Prefab {data.PrefabPath} not found!");
+            GameObject reference = Resources.Load<GameObject>(data.PrefabPath);
+            if (reference == null) {
+                MelonLogger.Warning($"Prefab {data.PrefabPath} not found!");
                 return;
             }
+            GameObject prefab = Object.Instantiate(reference);
 
             prefab.name = data.Name;
-            prefab.transform.SetParent(parent);
+            if (parent) prefab.transform.SetParent(parent);
             prefab.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
             prefab.transform.localRotation = Quaternion.Euler(0f, 0f, data.Rotation);
             prefab.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
+
+            if (data.Color != null && prefab.GetComponent<SpriteRenderer>()) {
+                prefab.GetComponent<SpriteRenderer>().color = new Color32(
+                    data.Color.R,
+                    data.Color.G,
+                    data.Color.B,
+                    data.Color.A
+                );
+            }
+
+            if (data.SlidingPlatform != null && prefab.GetComponent<SlidingPlatform>()) {
+                SlidingPlatform slidingPlatform = prefab.GetComponent<SlidingPlatform>();
+                //if (!slidingPlatform) prefab.AddComponent<SlidingPlatform>(); // need to check for depedency components
+                slidingPlatform.xv = data.SlidingPlatform.Xvelocity;
+                slidingPlatform.yv = data.SlidingPlatform.Yvelocity;
+                if (data.SlidingPlatform.IsIce) {
+                    GameObject ice = Object.Instantiate(Resources.Load<GameObject>("prefabs/platforming/Ice"));
+                    ice.transform.SetParent(prefab.transform);
+                    ice.transform.localPosition = new Vector3(0f, 0f, 0f);
+                    ice.transform.localScale = new Vector3(10f, 2f, 1f);
+                }
+            }
+
+            if (data.BouncePlatform != null && prefab.GetComponent<BouncePlatform>()) {
+                BouncePlatform bouncePlatform = prefab.GetComponent<BouncePlatform>();
+                bouncePlatform.xstrength = data.BouncePlatform.Xstrength;
+                bouncePlatform.ystrength = data.BouncePlatform.Ystrength;
+            }
         }
 
         private static Sprite CreateSquareSprite() {
@@ -218,6 +249,5 @@ namespace LevelInjector {
 
         private static List<GameObject> injectedRooms = new List<GameObject>();
         private static Sprite squareSprite;
-        private static int lastSceneHandle = -1;
     }
 }
