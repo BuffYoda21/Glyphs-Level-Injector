@@ -81,6 +81,9 @@ namespace LevelInjector {
 
         [JsonProperty("BouncePlatform")]
         public BouncePlatformData BouncePlatform;
+
+        [JsonProperty("Button")]
+        public ButtonData Button;
     }
 
     public class Color32Data {
@@ -114,5 +117,24 @@ namespace LevelInjector {
 
         [JsonProperty("ystrength")]
         public float Ystrength;
+    }
+
+    public class ButtonData {
+        [JsonProperty("pressTime")]
+        public float PressTime;
+
+        [JsonProperty("doors")]
+        public List<DoorData> Doors;
+    }
+
+    public class DoorData {
+        [JsonProperty("position")]
+        public Vec2 Position;
+
+        [JsonProperty("rotation")]
+        public float Rotation;
+
+        [JsonProperty("scale")]
+        public Vec2 Scale;
     }
 }

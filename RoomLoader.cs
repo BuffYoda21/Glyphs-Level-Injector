@@ -198,7 +198,7 @@ namespace LevelInjector {
             if (parent) prefab.transform.SetParent(parent);
             prefab.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
             prefab.transform.localRotation = Quaternion.Euler(0f, 0f, data.Rotation);
-            prefab.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
+            if (data.Scale != null) prefab.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
 
             if (data.Color != null && prefab.GetComponent<SpriteRenderer>()) {
                 prefab.GetComponent<SpriteRenderer>().color = new Color32(
@@ -226,6 +226,39 @@ namespace LevelInjector {
                 BouncePlatform bouncePlatform = prefab.GetComponent<BouncePlatform>();
                 bouncePlatform.xstrength = data.BouncePlatform.Xstrength;
                 bouncePlatform.ystrength = data.BouncePlatform.Ystrength;
+            }
+
+            if (data.Button != null) {
+                Transform button = prefab.transform.Find("Button");
+                if (button && button.GetComponent<ButtonObj>()) {
+                    ButtonObj buttonObj = button.GetComponent<ButtonObj>();
+                    buttonObj.timePressed = data.Button.PressTime;
+                    var openCalls = buttonObj.onPressed.m_PersistentCalls.m_Calls;
+                    var closeCalls = buttonObj.onUnpressed.m_PersistentCalls.m_Calls;
+                    foreach (DoorData door in data.Button.Doors) {
+                        GameObject doorObj = Object.Instantiate(Resources.Load<GameObject>("prefabs/platforming/Door"));
+                        doorObj.transform.SetParent(parent);
+                        doorObj.transform.localPosition = new Vector3(door.Position.X, door.Position.Y, 0f);
+                        doorObj.transform.localRotation = Quaternion.Euler(0f, 0f, door.Rotation);
+                        doorObj.transform.localScale = new Vector3(door.Scale.X, door.Scale.Y, 1f);
+                        var doorOpenCall = new UnityEngine.Events.PersistentCall();
+                        doorOpenCall.m_MethodName = "SetTrigger";
+                        doorOpenCall.m_Mode = UnityEngine.Events.PersistentListenerMode.String;
+                        doorOpenCall.m_Target = doorObj.GetComponent<Animator>();
+                        doorOpenCall.m_TargetAssemblyTypeName = "UnityEngine.Animator, UnityEngine";
+                        doorOpenCall.m_Arguments.m_ObjectArgumentAssemblyTypeName = "UnityEngine.GameObject, UnityEngine";
+                        doorOpenCall.m_Arguments.m_StringArgument = "open";
+                        openCalls.Add(doorOpenCall);
+                        var doorCloseCall = new UnityEngine.Events.PersistentCall();
+                        doorCloseCall.m_MethodName = "SetTrigger";
+                        doorCloseCall.m_Mode = UnityEngine.Events.PersistentListenerMode.String;
+                        doorCloseCall.m_Target = doorObj.GetComponent<Animator>();
+                        doorCloseCall.m_TargetAssemblyTypeName = "UnityEngine.Animator, UnityEngine";
+                        doorCloseCall.m_Arguments.m_ObjectArgumentAssemblyTypeName = "UnityEngine.GameObject, UnityEngine";
+                        doorCloseCall.m_Arguments.m_StringArgument = "close";
+                        closeCalls.Add(doorCloseCall);
+                    }
+                }
             }
         }
 
