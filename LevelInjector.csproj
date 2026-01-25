@@ -24,8 +24,8 @@
     <Reference Include="Il2CppInterop.Runtime">
       <HintPath>Il2CppInterop.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>UnityEngine.AssetBundleModule.dll</HintPath>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
       <HintPath>UnityEngine.AudioModule.dll</HintPath>
