@@ -4,7 +4,7 @@ using UnityEngine;
 using HarmonyLib;
 using UnityEngine.SceneManagement;
 
-[assembly: MelonInfo(typeof(LevelInjector.Main), "LevelInjector", "0.0.4", "BuffYoda21")]
+[assembly: MelonInfo(typeof(LevelInjector.Main), "LevelInjector", "0.0.5", "BuffYoda21")]
 [assembly: MelonGame("Vortex Bros.", "GLYPHS")]
 
 namespace LevelInjector {
