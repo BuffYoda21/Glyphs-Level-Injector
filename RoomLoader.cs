@@ -158,7 +158,7 @@ namespace LevelInjector {
             return roomObj;
         }
 
-        private static void SpawnTile(TileData data, Transform parent) {
+        private static GameObject SpawnTile(TileData data, Transform parent) {
             GameObject tile = new GameObject("Tile");
             tile.transform.SetParent(parent);
             tile.layer = 3; // tile layer
@@ -184,13 +184,15 @@ namespace LevelInjector {
                     data.Color.A
                 );
             }
+
+            return tile;
         }
 
-        private static void SpawnPrefab(PrefabData data, Transform parent) {
+        private static GameObject SpawnPrefab(PrefabData data, Transform parent) {
             GameObject reference = Resources.Load<GameObject>(data.PrefabPath);
             if (reference == null) {
                 MelonLogger.Warning($"Prefab {data.PrefabPath} not found!");
-                return;
+                return null;
             }
             GameObject prefab = Object.Instantiate(reference);
 
@@ -226,6 +228,29 @@ namespace LevelInjector {
                 BouncePlatform bouncePlatform = prefab.GetComponent<BouncePlatform>();
                 bouncePlatform.xstrength = data.BouncePlatform.Xstrength;
                 bouncePlatform.ystrength = data.BouncePlatform.Ystrength;
+            }
+
+            if (data.SwapData != null && prefab.GetComponent<SwapBlock>()) {
+                GameObject on = prefab.transform.Find("On").gameObject;
+                GameObject off = prefab.transform.Find("Off").gameObject;
+                off.transform.localPosition = new Vector3(0f, 0f, 0.1f);
+                if (on && off) {
+                    if (data.SwapData.On.Tiles != null)
+                        foreach (TileData tile in data.SwapData.On.Tiles)
+                            SpawnTile(tile, on.transform);
+                    if (data.SwapData.On.Elements != null)
+                        foreach (PrefabData childPrefab in data.SwapData.On.Elements)
+                            SpawnPrefab(childPrefab, on.transform);
+                    if (data.SwapData.Off.Tiles != null)
+                        foreach (TileData tile in data.SwapData.Off.Tiles)
+                            SpawnTile(tile, off.transform);
+                    if (data.SwapData.Off.Elements != null)
+                        foreach (PrefabData childPrefab in data.SwapData.Off.Elements) {
+                            GameObject obj = SpawnPrefab(childPrefab, off.transform);
+                            if (obj?.GetComponent<BoxCollider2D>())
+                                obj.GetComponent<BoxCollider2D>().enabled = false;
+                        }
+                }
             }
 
             if (data.Button != null) {
@@ -284,6 +309,8 @@ namespace LevelInjector {
                     }
                 }
             }
+
+            return prefab;
         }
 
         private static Sprite CreateSquareSprite() {

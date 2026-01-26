@@ -85,6 +85,9 @@ namespace LevelInjector {
         [JsonProperty("Button")]
         public ButtonData Button;
 
+        [JsonProperty("SwapData")]
+        public SwapData SwapData;
+
         [JsonProperty("children")]
         public ChildData Children;
     }
@@ -148,6 +151,14 @@ namespace LevelInjector {
 
         [JsonProperty("children")]
         public ChildData Children;
+    }
+
+    public class SwapData {
+        [JsonProperty("on")]
+        public ChildData On;
+
+        [JsonProperty("off")]
+        public ChildData Off;
     }
 
     public class ChildData {
