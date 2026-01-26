@@ -84,6 +84,9 @@ namespace LevelInjector {
 
         [JsonProperty("Button")]
         public ButtonData Button;
+
+        [JsonProperty("children")]
+        public ChildData Children;
     }
 
     public class Color32Data {
@@ -136,5 +139,22 @@ namespace LevelInjector {
 
         [JsonProperty("scale")]
         public Vec2 Scale;
+
+        [JsonProperty("color")]
+        public Color32Data Color;
+
+        [JsonProperty("isTangible")]
+        public bool IsTangible = true;
+
+        [JsonProperty("children")]
+        public ChildData Children;
+    }
+
+    public class ChildData {
+        [JsonProperty("tiles")]
+        public List<TileData> Tiles;
+
+        [JsonProperty("elements")]
+        public List<PrefabData> Elements;
     }
 }

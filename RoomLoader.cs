@@ -241,6 +241,29 @@ namespace LevelInjector {
                         doorObj.transform.localPosition = new Vector3(door.Position.X, door.Position.Y, 0f);
                         doorObj.transform.localRotation = Quaternion.Euler(0f, 0f, door.Rotation);
                         doorObj.transform.localScale = new Vector3(door.Scale.X, door.Scale.Y, 1f);
+
+                        if (door.Color != null) {
+                            doorObj.GetComponent<SpriteRenderer>().color = new Color32(
+                                door.Color.R,
+                                door.Color.G,
+                                door.Color.B,
+                                door.Color.A
+                            );
+                        }
+
+                        if (!door.IsTangible) doorObj.GetComponent<BoxCollider2D>().enabled = false;
+
+                        if (door.Children != null) {
+                            if (door.Children.Tiles != null)
+                                foreach (TileData tile in door.Children.Tiles)
+                                    SpawnTile(tile, doorObj.transform);
+                            if (door.Children.Elements != null)
+                                foreach (PrefabData childPrefab in door.Children.Elements)
+                                    SpawnPrefab(childPrefab, doorObj.transform);
+                        }
+
+                        doorObj.transform.localRotation = Quaternion.Euler(0f, 0f, door.Rotation);
+
                         var doorOpenCall = new UnityEngine.Events.PersistentCall();
                         doorOpenCall.m_MethodName = "SetTrigger";
                         doorOpenCall.m_Mode = UnityEngine.Events.PersistentListenerMode.String;
@@ -249,6 +272,7 @@ namespace LevelInjector {
                         doorOpenCall.m_Arguments.m_ObjectArgumentAssemblyTypeName = "UnityEngine.GameObject, UnityEngine";
                         doorOpenCall.m_Arguments.m_StringArgument = "open";
                         openCalls.Add(doorOpenCall);
+
                         var doorCloseCall = new UnityEngine.Events.PersistentCall();
                         doorCloseCall.m_MethodName = "SetTrigger";
                         doorCloseCall.m_Mode = UnityEngine.Events.PersistentListenerMode.String;
