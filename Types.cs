@@ -6,11 +6,14 @@ namespace LevelInjector {
         [JsonProperty("localPosition")]
         public Vec2 LocalPosition;
 
-        [JsonProperty("tiles")]
-        public List<TileData> Tiles;
+        [JsonProperty("size")]
+        public Dimensions Size;
 
         [JsonProperty("bg")]
         public BgData Bg;
+
+        [JsonProperty("tiles")]
+        public List<TileData> Tiles;
 
         [JsonProperty("elements")]
         public List<PrefabData> Elements;

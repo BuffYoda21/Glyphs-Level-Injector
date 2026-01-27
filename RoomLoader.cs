@@ -120,6 +120,28 @@ namespace LevelInjector {
 
             CreateSquareSprite();
 
+            int screensHorizontal = 1;
+            int screensVertical = 1;
+            if (roomData.Size != null) {
+                screensHorizontal = roomData.Size.Width;
+                screensVertical = roomData.Size.Height;
+                if (screensHorizontal > 1 || screensVertical > 1) {
+                    GameObject nodeA = new GameObject("FreeCamNodeA");
+                    nodeA.transform.SetParent(roomObj.transform);
+                    nodeA.transform.localPosition = new Vector2(0f, 0f);
+                    FreeCameraNode nodeComp = nodeA.AddComponent<FreeCameraNode>();
+                    nodeComp.xMaxMargin = screensHorizontal - 1;
+                    nodeComp.yMaxMargin = screensVertical - 1;
+
+                    GameObject nodeB = new GameObject("FreeCamNodeB");
+                    nodeB.transform.SetParent(roomObj.transform);
+                    nodeB.transform.localPosition = new Vector2((screensHorizontal - 1) * 28.5f, (screensVertical - 1) * 16f);
+                    nodeComp = nodeB.AddComponent<FreeCameraNode>();
+                    nodeComp.xMinMargin = screensHorizontal - 1;
+                    nodeComp.yMinMargin = screensVertical - 1;
+                }
+            }
+
             if (roomData.Tiles != null) {
                 foreach (TileData tile in roomData.Tiles) {
                     SpawnTile(tile, roomObj.transform);
@@ -129,6 +151,7 @@ namespace LevelInjector {
             if (roomData.Bg != null) {
                 GameObject bg = new GameObject("bg");
                 bg.transform.SetParent(roomObj.transform);
+                bg.transform.localPosition = new Vector2((screensHorizontal - 1) * 28.5f / 2f, (screensVertical - 1) * 16f / 2f);
 
                 SpriteRenderer sr = bg.AddComponent<SpriteRenderer>();
                 sr.color = new Color32(
@@ -141,7 +164,7 @@ namespace LevelInjector {
 
                 if (roomData.Bg.Path == null) {
                     sr.sprite = squareSprite;
-                    bg.transform.localScale = new Vector2(28.5f, 16f);
+                    bg.transform.localScale = new Vector2(28.5f * screensHorizontal, 16f * screensVertical);
                 } else {
                     string dataPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "SpriteData");
                     sr.sprite = SpriteLoader.LoadSpriteFromFile(Path.Combine(dataPath, roomData.Bg.Path), roomData.Bg.ImgSize.Width, roomData.Bg.ImgSize.Height);
