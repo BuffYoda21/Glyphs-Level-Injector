@@ -33,20 +33,21 @@ namespace LevelInjector {
                         .Concat(Directory.GetFiles(rootPath, "*.jsonc", SearchOption.AllDirectories))) {
                 GameObject room = LoadRoomFromFile(jsonPath, rootPath);
                 if (!room || room.name.Length < 2) continue;
-                char[] prefix = room.name.ToCharArray();
+                char[] charArray = room.name.ToCharArray();
+                char[] postfix = charArray.Skip(charArray.Length - 2).ToArray();
                 if (
-                    (prefix[0] != '_' && prefix[0] != '-' && prefix[0] != '^') ||
-                    (prefix[1] != '_' && prefix[1] != '-' && prefix[1] != '^')
+                    (postfix[0] != '_' && postfix[0] != '-' && postfix[0] != '^') ||
+                    (postfix[1] != '_' && postfix[1] != '-' && postfix[1] != '^')
                 ) continue;
 
                 BetweenManager.EntranceType roomEntrance = BetweenManager.EntranceType.Top;
                 BetweenManager.ExitType roomExit = BetweenManager.ExitType.Top;
-                switch (prefix[0]) {
+                switch (postfix[0]) {
                     case '_': roomEntrance = BetweenManager.EntranceType.Bottom; break;
                     case '-': roomEntrance = BetweenManager.EntranceType.Middle; break;
                     case '^': roomEntrance = BetweenManager.EntranceType.Top; break;
                 }
-                switch (prefix[1]) {
+                switch (postfix[1]) {
                     case '_': roomExit = BetweenManager.ExitType.Bottom; break;
                     case '-': roomExit = BetweenManager.ExitType.Middle; break;
                     case '^': roomExit = BetweenManager.ExitType.Top; break;
