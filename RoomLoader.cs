@@ -267,7 +267,7 @@ namespace LevelInjector {
                             SpawnPrefab(childPrefab, on.transform);
                     if (data.SwapData.Off.Tiles != null)
                         foreach (TileData tile in data.SwapData.Off.Tiles)
-                            SpawnTile(tile, off.transform);
+                            SpawnTile(tile, off.transform).GetComponent<BoxCollider2D>().enabled = false;
                     if (data.SwapData.Off.Elements != null)
                         foreach (PrefabData childPrefab in data.SwapData.Off.Elements) {
                             GameObject obj = SpawnPrefab(childPrefab, off.transform);
