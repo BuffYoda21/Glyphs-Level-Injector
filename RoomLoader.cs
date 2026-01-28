@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using HarmonyLib;
 using Il2Cpp;
+using LevelInjector.API;
 using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
@@ -179,6 +180,12 @@ namespace LevelInjector {
                 }
             }
 
+            if (roomData.CustomObjects != null) {
+                foreach (CustomObjectData customObject in roomData.CustomObjects) {
+                    SpawnCustomObject(customObject, roomObj.transform);
+                }
+            }
+
             return roomObj;
         }
 
@@ -309,6 +316,9 @@ namespace LevelInjector {
                             if (door.Children.Elements != null)
                                 foreach (PrefabData childPrefab in door.Children.Elements)
                                     SpawnPrefab(childPrefab, doorObj.transform);
+                            if (door.Children.CustomObjects != null)
+                                foreach (CustomObjectData childObj in door.Children.CustomObjects)
+                                    SpawnCustomObject(childObj, doorObj.transform);
                         }
 
                         doorObj.transform.localRotation = Quaternion.Euler(0f, 0f, door.Rotation);
@@ -334,7 +344,57 @@ namespace LevelInjector {
                 }
             }
 
+            if (data.Children == null) return null;
+            if (data.Children.Tiles != null)
+                foreach (TileData tile in data.Children.Tiles)
+                    SpawnTile(tile, prefab.transform);
+            if (data.Children.Elements != null)
+                foreach (PrefabData childPrefab in data.Children.Elements)
+                    SpawnPrefab(childPrefab, prefab.transform);
+            if (data.Children.CustomObjects != null)
+                foreach (CustomObjectData childObj in data.Children.CustomObjects)
+                    SpawnCustomObject(childObj, prefab.transform);
+
             return prefab;
+        }
+
+        private static GameObject SpawnCustomObject(CustomObjectData data, Transform parent) {
+            GameObject obj = new GameObject(data.Name);
+            obj.transform.SetParent(parent);
+            obj.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
+            obj.transform.localRotation = Quaternion.Euler(0f, 0f, data.Rotation);
+            if (data.Scale != null) obj.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
+
+            SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
+
+            if (data.Color != null) {
+                sr.color = new Color32(
+                    data.Color.R,
+                    data.Color.G,
+                    data.Color.B,
+                    data.Color.A
+                );
+            }
+
+            if (data.ImgPath != null)
+                sr.sprite = SpriteLoader.LoadSpriteFromFile(data.ImgPath, data.ImgSize.Width, data.ImgSize.Height);
+
+            if (data.CustomScripts != null)
+                foreach (string script in data.CustomScripts)
+                    ExternalComponentManager.TryAddComponent(script, obj);
+
+            if (data.Children == null) return null;
+            if (data.Children.Tiles != null)
+                foreach (TileData tile in data.Children.Tiles)
+                    SpawnTile(tile, obj.transform);
+            if (data.Children.Elements != null)
+                foreach (PrefabData prefab in data.Children.Elements)
+                    SpawnPrefab(prefab, obj.transform);
+            if (data.Children.CustomObjects != null)
+                foreach (CustomObjectData childObj in data.Children.CustomObjects)
+                    SpawnCustomObject(childObj, obj.transform);
+
+            return obj;
         }
 
         private static Sprite CreateSquareSprite() {

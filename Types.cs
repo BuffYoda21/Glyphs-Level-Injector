@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace LevelInjector {
     public class RoomData {
@@ -17,6 +18,9 @@ namespace LevelInjector {
 
         [JsonProperty("elements")]
         public List<PrefabData> Elements;
+
+        [JsonProperty("customObjects")]
+        public List<CustomObjectData> CustomObjects;
     }
 
     public class TileData {
@@ -90,6 +94,35 @@ namespace LevelInjector {
 
         [JsonProperty("SwapData")]
         public SwapData SwapData;
+
+        [JsonProperty("children")]
+        public ChildData Children;
+    }
+
+    public class CustomObjectData {
+        [JsonProperty("name")]
+        public string Name;
+
+        [JsonProperty("position")]
+        public Vec2 Position;
+
+        [JsonProperty("rotation")]
+        public float Rotation;
+
+        [JsonProperty("scale")]
+        public Vec2 Scale;
+
+        [JsonProperty("color")]
+        public Color32Data Color;
+
+        [JsonProperty("imgPath")]
+        public string ImgPath;
+
+        [JsonProperty("imgSize")]
+        public Dimensions ImgSize;
+
+        [JsonProperty("customScripts")]
+        public List<string> CustomScripts;
 
         [JsonProperty("children")]
         public ChildData Children;
@@ -170,5 +203,8 @@ namespace LevelInjector {
 
         [JsonProperty("elements")]
         public List<PrefabData> Elements;
+
+        [JsonProperty("customObjects")]
+        public List<CustomObjectData> CustomObjects;
     }
 }

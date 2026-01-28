@@ -3,6 +3,7 @@ using Il2CppInterop.Runtime.Injection;
 using UnityEngine;
 using HarmonyLib;
 using UnityEngine.SceneManagement;
+using LevelInjector.API;
 
 [assembly: MelonInfo(typeof(LevelInjector.Main), "LevelInjector", "0.0.5", "BuffYoda21")]
 [assembly: MelonGame("Vortex Bros.", "GLYPHS")]
@@ -17,6 +18,7 @@ namespace LevelInjector {
             // class injection here
             ClassInjector.RegisterTypeInIl2Cpp<KeyboardShortcuts>();
 
+            ExternalComponentManager.Init();
             isInitialized = true;
         }
 
