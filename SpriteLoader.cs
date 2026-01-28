@@ -14,6 +14,8 @@ namespace LevelInjector {
             string[] splitPath = path.Split(Path.DirectorySeparatorChar);
             tex.name = splitPath[splitPath.Length - 1];
             tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            tex.filterMode = FilterMode.Point;
+            tex.wrapMode = TextureWrapMode.Clamp;
 
             if (!File.Exists(path)) {
                 MelonLogger.Error($"{path} does not exist!");
@@ -47,7 +49,7 @@ namespace LevelInjector {
                 tex,
                 new Rect(0, 0, width, height),
                 new Vector2(0.5f, 0.5f),
-                100f
+                8f
             );
         }
     }
