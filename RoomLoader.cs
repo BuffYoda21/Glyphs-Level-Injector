@@ -367,6 +367,8 @@ namespace LevelInjector {
 
             SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
 
+            sr.sprite = CreateSquareSprite();
+
             if (data.Color != null) {
                 sr.color = new Color32(
                     data.Color.R,
