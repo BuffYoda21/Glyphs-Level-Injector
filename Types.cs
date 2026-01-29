@@ -74,6 +74,9 @@ namespace LevelInjector {
         [JsonProperty("position")]
         public Vec2 Position;
 
+        [JsonProperty("order")]
+        public int Order;
+
         [JsonProperty("rotation")]
         public float Rotation;
 
@@ -105,6 +108,9 @@ namespace LevelInjector {
 
         [JsonProperty("position")]
         public Vec2 Position;
+
+        [JsonProperty("order")]
+        public int Order;
 
         [JsonProperty("rotation")]
         public float Rotation;
@@ -172,6 +178,9 @@ namespace LevelInjector {
     public class DoorData {
         [JsonProperty("position")]
         public Vec2 Position;
+
+        [JsonProperty("order")]
+        public int Order;
 
         [JsonProperty("rotation")]
         public float Rotation;

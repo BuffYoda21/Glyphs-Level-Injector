@@ -229,7 +229,7 @@ namespace LevelInjector {
 
             prefab.name = data.Name;
             if (parent) prefab.transform.SetParent(parent);
-            prefab.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
+            prefab.transform.localPosition = new Vector3(data.Position.X, data.Position.Y, data.Order * -0.01f);
             prefab.transform.localRotation = Quaternion.Euler(0f, 0f, data.Rotation);
             if (data.Scale != null) prefab.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
 
@@ -294,7 +294,7 @@ namespace LevelInjector {
                     foreach (DoorData door in data.Button.Doors) {
                         GameObject doorObj = Object.Instantiate(Resources.Load<GameObject>("prefabs/platforming/Door"));
                         doorObj.transform.SetParent(parent);
-                        doorObj.transform.localPosition = new Vector3(door.Position.X, door.Position.Y, 0f);
+                        doorObj.transform.localPosition = new Vector3(door.Position.X, door.Position.Y, door.Order * -0.01f);
                         doorObj.transform.localRotation = Quaternion.Euler(0f, 0f, door.Rotation);
                         doorObj.transform.localScale = new Vector3(door.Scale.X, door.Scale.Y, 1f);
 
@@ -361,7 +361,7 @@ namespace LevelInjector {
         private static GameObject SpawnCustomObject(CustomObjectData data, Transform parent) {
             GameObject obj = new GameObject(data.Name);
             obj.transform.SetParent(parent);
-            obj.transform.localPosition = new Vector2(data.Position.X, data.Position.Y);
+            obj.transform.localPosition = new Vector3(data.Position.X, data.Position.Y, data.Order * -0.01f);
             obj.transform.localRotation = Quaternion.Euler(0f, 0f, data.Rotation);
             if (data.Scale != null) obj.transform.localScale = new Vector3(data.Scale.X, data.Scale.Y, 1f);
 
