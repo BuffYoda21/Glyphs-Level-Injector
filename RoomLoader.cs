@@ -86,7 +86,7 @@ namespace LevelInjector {
             }
         }
 
-        private static GameObject LoadRoomFromFile(string jsonPath, string rootPath) {
+        public static GameObject LoadRoomFromFile(string jsonPath, string rootPath) {
             string relativePath = Path.GetRelativePath(rootPath, jsonPath);
             string[] pathParts = relativePath.Split(Path.DirectorySeparatorChar);
 
