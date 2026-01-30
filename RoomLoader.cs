@@ -399,7 +399,7 @@ namespace LevelInjector {
             return obj;
         }
 
-        private static Sprite CreateSquareSprite() {
+        public static Sprite CreateSquareSprite() {
             if (squareSprite) return squareSprite;
 
             Texture2D tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
