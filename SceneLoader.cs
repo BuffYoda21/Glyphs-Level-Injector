@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
@@ -9,9 +10,19 @@ namespace LevelInjector {
     [HarmonyPatch]
     public static class SceneLoader {
         public static void LoadCustomScene(string scene) {
-            customSceneToLoad = scene;
+            overrideSpawnPosition = false;
+            LoadCustomScene(scene, Vector2.zero);
+        }
+
+        public static void LoadCustomScene(string scene, Vector2 pos) {
+            spawnPosition = pos;
             CachePlayerAbilities();
-            SceneManager.LoadScene("Memory");
+            if (scene != "Game" && scene != "Memory" && scene != "Outer Void") {
+                customSceneToLoad = scene;
+                SceneManager.LoadScene("Memory");
+            } else {
+                SceneManager.LoadScene(scene);
+            }
         }
 
         [HarmonyPatch(typeof(SceneManager), "Internal_SceneLoaded")]
@@ -24,9 +35,13 @@ namespace LevelInjector {
                 sceneToLoad = customSceneToLoad;
                 customSceneToLoad = null;
                 MelonCoroutines.Start(FullClearScene());
+                player = GameObject.Find("Player")?.GetComponent<PlayerController>();
                 RestorePlayerAbilities();
+                if (overrideSpawnPosition && player)
+                    player.transform.position = spawnPosition;
             }
             RoomLoader.LoadRooms(sceneToLoad);
+            overrideSpawnPosition = true;
         }
 
         private static IEnumerator FullClearScene() {
@@ -47,7 +62,6 @@ namespace LevelInjector {
         }
 
         private static void RestorePlayerAbilities() {
-            PlayerController player = GameObject.Find("Player")?.GetComponent<PlayerController>();
             if (!player) return;
             player.midairJumpsMax = playerState.jumps;
             player.saveCrystals = playerState.saveCrystals;
@@ -104,6 +118,9 @@ namespace LevelInjector {
 
         private static int lastSceneHandle = -1;
         private static string customSceneToLoad = null;
+        private static PlayerController player;
         private static PlayerState playerState = new PlayerState();
+        private static bool overrideSpawnPosition = true;
+        private static Vector2 spawnPosition;
     }
 }
