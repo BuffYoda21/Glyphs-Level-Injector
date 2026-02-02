@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
@@ -33,12 +32,16 @@ namespace LevelInjector {
             string sceneToLoad = scene.name;
             if (sceneToLoad == "Memory" && !string.IsNullOrEmpty(customSceneToLoad)) {
                 sceneToLoad = customSceneToLoad;
+                customSceneName = customSceneToLoad;
                 customSceneToLoad = null;
+                GameObject.Find("Canvas/memoryvisual")?.SetActive(false);
                 MelonCoroutines.Start(FullClearScene());
                 player = GameObject.Find("Player")?.GetComponent<PlayerController>();
                 RestorePlayerAbilities();
                 if (overrideSpawnPosition && player)
                     player.transform.position = spawnPosition;
+            } else {
+                customSceneName = null;
             }
             RoomLoader.LoadRooms(sceneToLoad);
             overrideSpawnPosition = true;
@@ -118,6 +121,7 @@ namespace LevelInjector {
 
         private static int lastSceneHandle = -1;
         private static string customSceneToLoad = null;
+        public static string customSceneName;
         private static PlayerController player;
         private static PlayerState playerState = new PlayerState();
         private static bool overrideSpawnPosition = true;
