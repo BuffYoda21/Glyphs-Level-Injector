@@ -8,6 +8,7 @@ using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace LevelInjector {
     [HarmonyPatch]
@@ -21,6 +22,14 @@ namespace LevelInjector {
                 LoadRoomFromFile(jsonPath, rootPath);
             }
         }
+
+        public static GameObject GetLoadedRoom(string name) =>
+            allLoadedRooms.ContainsKey(name) ? allLoadedRooms[name] : null;
+
+        [HarmonyPatch(typeof(SceneManager), "Internal_SceneLoaded")]
+        [HarmonyPrefix]
+        public static void OnSceneLoaded(Scene scene, LoadSceneMode mode) =>
+            allLoadedRooms.Clear();
 
         [HarmonyPatch(typeof(BetweenManager), "LoadRoomsFromResources")]
         [HarmonyPrefix]
@@ -186,6 +195,7 @@ namespace LevelInjector {
                 }
             }
 
+            allLoadedRooms[fileName] = roomObj;
             return roomObj;
         }
 
@@ -418,6 +428,7 @@ namespace LevelInjector {
         }
 
         private static List<GameObject> injectedRooms = new List<GameObject>();
+        private static Dictionary<string, GameObject> allLoadedRooms = new Dictionary<string, GameObject>();
         private static Sprite squareSprite;
     }
 }
