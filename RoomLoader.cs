@@ -428,7 +428,7 @@ namespace LevelInjector {
         }
 
         private static List<GameObject> injectedRooms = new List<GameObject>();
-        private static Dictionary<string, GameObject> allLoadedRooms = new Dictionary<string, GameObject>();
+        public static Dictionary<string, GameObject> allLoadedRooms = new Dictionary<string, GameObject>();
         private static Sprite squareSprite;
     }
 }
