@@ -1,10 +1,13 @@
 using System.IO;
 using MelonLoader;
+using MelonLoader.Utils;
 using UnityEngine;
 
 namespace LevelInjector {
     public static class SpriteLoader {
         public static Sprite LoadSpriteFromFile(string path, int width, int height) {
+            path = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "SpriteData", path);
+
             Texture2D tex = new Texture2D(
                 width,
                 height,

@@ -178,7 +178,7 @@ namespace LevelInjector {
                     bg.transform.localScale = new Vector2(28.5f * screensHorizontal, 16f * screensVertical);
                 } else {
                     string dataPath = Path.Combine(MelonEnvironment.ModsDirectory, "CustomRooms", "SpriteData");
-                    sr.sprite = SpriteLoader.LoadSpriteFromFile(Path.Combine(dataPath, roomData.Bg.Path), roomData.Bg.ImgSize.Width, roomData.Bg.ImgSize.Height);
+                    sr.sprite = SpriteLoader.LoadSpriteFromFile(roomData.Bg.Path, roomData.Bg.ImgSize.Width, roomData.Bg.ImgSize.Height);
                     bg.transform.localScale = new Vector2(roomData.Bg.Scale.X, roomData.Bg.Scale.Y);
                 }
             }
