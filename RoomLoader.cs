@@ -171,7 +171,7 @@ namespace LevelInjector {
                     roomData.Bg.Color.B,
                     roomData.Bg.Color.A
                 );
-                sr.sortingOrder = -100;
+                sr.sortingOrder = -1000;
 
                 if (roomData.Bg.Path == null) {
                     sr.sprite = squareSprite;
