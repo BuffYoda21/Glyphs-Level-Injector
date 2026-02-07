@@ -19,7 +19,10 @@ namespace LevelInjector {
             CachePlayerAbilities();
             if (scene != "Game" && scene != "Memory" && scene != "Outer Void") {
                 customSceneToLoad = scene;
-                SceneManager.LoadScene("Memory");
+                if (scene.StartsWith("(void)"))
+                    SceneManager.LoadScene("Outer Void");
+                else
+                    SceneManager.LoadScene("Memory");
             } else {
                 SceneManager.LoadScene(scene);
             }
@@ -31,16 +34,22 @@ namespace LevelInjector {
             if (scene.handle == lastSceneHandle) return;
             lastSceneHandle = scene.handle;
             string sceneToLoad = scene.name;
-            if (sceneToLoad == "Memory" && !string.IsNullOrEmpty(customSceneToLoad)) {
+            if ((sceneToLoad == "Memory" || sceneToLoad == "Outer Void") && !string.IsNullOrEmpty(customSceneToLoad)) {
                 sceneToLoad = customSceneToLoad;
                 customSceneName = customSceneToLoad;
                 customSceneToLoad = null;
-                GameObject.Find("Canvas/memoryvisual")?.SetActive(false);
-                MelonCoroutines.Start(FullClearScene());
                 player = GameObject.Find("Player")?.GetComponent<PlayerController>();
                 RestorePlayerAbilities();
                 if (overrideSpawnPosition && player)
                     player.transform.position = spawnPosition;
+                if (scene.name == "Memory") {
+                    GameObject.Find("Canvas/memoryvisual")?.SetActive(false);
+                    MelonCoroutines.Start(FullClearScene());
+                } else {
+                    voidGameManager = GameObject.Find("Void [Game Manager]")?.GetComponent<VoidGameManager>();
+                    if (voidGameManager) voidGameManager.gameObject.SetActive(false);
+                    GameObject.Find("Main Camera Parent/Main Camera/timerParent")?.SetActive(false);
+                }
             } else {
                 customSceneName = null;
             }
@@ -110,6 +119,14 @@ namespace LevelInjector {
             playerState.shroud = player.hasShroud;
         }
 
+        [HarmonyPatch(typeof(ClarityFigure), "Start")]
+        [HarmonyPostfix]
+        private static void FixClarityFigureReferences() {
+            ClarityFigure clarityFigure = GameObject.Find("Clarity Figure")?.GetComponent<ClarityFigure>();
+            if (!clarityFigure) return;
+            clarityFigure.vgm = voidGameManager;
+        }
+
         public static void RegisterRoomLoadHook(System.Action hook) {
             if (hook != null && !postRoomLoadHooks.Contains(hook)) postRoomLoadHooks.Add(hook);
         }
@@ -138,6 +155,7 @@ namespace LevelInjector {
         private static PlayerState playerState = new PlayerState();
         private static bool overrideSpawnPosition = true;
         private static Vector2 spawnPosition;
+        private static VoidGameManager voidGameManager; // needed because ClarityFigure.vgm calls GameObject.Find("Void [Game Manager]") to get it's reference and will not check if it even needs to do this in the first place
         private static List<System.Action> postRoomLoadHooks = new List<System.Action>();
     }
 }
