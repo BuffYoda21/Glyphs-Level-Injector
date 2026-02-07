@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
@@ -44,6 +45,13 @@ namespace LevelInjector {
                 customSceneName = null;
             }
             RoomLoader.LoadRooms(sceneToLoad);
+            foreach (System.Action roomLoadHook in postRoomLoadHooks) {
+                try {
+                    roomLoadHook();
+                } catch (System.Exception ex) {
+                    MelonLogger.Error($"RoomLoadHook threw: {ex}");
+                }
+            }
             overrideSpawnPosition = true;
         }
 
@@ -102,6 +110,10 @@ namespace LevelInjector {
             playerState.shroud = player.hasShroud;
         }
 
+        public static void RegisterRoomLoadHook(System.Action hook) {
+            if (hook != null && !postRoomLoadHooks.Contains(hook)) postRoomLoadHooks.Add(hook);
+        }
+
         private class PlayerState {
             public int jumps = 0;
             public int saveCrystals = 0;
@@ -126,5 +138,6 @@ namespace LevelInjector {
         private static PlayerState playerState = new PlayerState();
         private static bool overrideSpawnPosition = true;
         private static Vector2 spawnPosition;
+        private static List<System.Action> postRoomLoadHooks = new List<System.Action>();
     }
 }
